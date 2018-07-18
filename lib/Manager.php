@@ -417,6 +417,37 @@ class Manager {
 		throw new RoomNotFoundException();
 	}
 
+// 	/**
+// 	 * @param string $objectType
+// 	 * @param string $objectId
+// 	 * @return Room
+// 	 * @throws RoomNotFoundException
+// 	 */
+// 	public function getRoomsForObject(string $objectType, string $objectId) {
+// 		$query = $this->db->getQueryBuilder();
+// 		$query->select('*')
+// 			->from('talk_rooms')
+// 			->where($query->expr()->eq('object_type', $query->createNamedParameter($objectType)))
+// 			->andWhere($query->expr()->eq('object_id', $query->createNamedParameter($objectId)));
+// 
+// 		$result = $query->execute();
+// 		$row = $result->fetch();
+// 		$result->closeCursor();
+// 
+// 		if ($row === false) {
+// 			throw new RoomNotFoundException();
+// 		}
+// 
+// 		$result = $query->execute();
+// 		$rooms = [];
+// 		while ($row = $result->fetch()) {
+// 			$rooms[] = $this->createRoomObject($row);
+// 		}
+// 		$result->closeCursor();
+// 
+// 		return $rooms;
+// 	}
+
 	/**
 	 * @param string $participant1
 	 * @param string $participant2

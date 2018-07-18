@@ -591,7 +591,8 @@
 				return shareType === OC.Share.SHARE_TYPE_USER ||
 						shareType === OC.Share.SHARE_TYPE_GROUP ||
 						shareType === OC.Share.SHARE_TYPE_CIRCLE ||
-						shareType === OC.Share.SHARE_TYPE_ROOM;
+						shareType === OC.Share.SHARE_TYPE_ROOM ||
+						shareType === OC.Share.SHARE_TYPE_LINK;
 			});
 
 			if (shareTypes.length === 0) {

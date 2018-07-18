@@ -42,6 +42,7 @@ use OCA\Spreed\Notification\Listener as NotificationListener;
 use OCA\Spreed\Notification\Notifier;
 use OCA\Spreed\PublicShareAuth\Listener as PublicShareAuthListener;
 use OCA\Spreed\PublicShareAuth\TemplateLoader as PublicShareAuthTemplateLoader;
+use OCA\Spreed\PublicShare\TemplateLoader as PublicShareTemplateLoader;
 use OCA\Spreed\Room;
 use OCA\Spreed\Settings\Personal;
 use OCA\Spreed\Share\RoomShareProvider;
@@ -108,6 +109,7 @@ class Application extends App {
 		ParserListener::register($dispatcher);
 		PublicShareAuthListener::register($dispatcher);
 		PublicShareAuthTemplateLoader::register($dispatcher);
+		PublicShareTemplateLoader::register($dispatcher);
 		FilesListener::register($dispatcher);
 		FilesTemplateLoader::register($dispatcher);
 		RoomShareProvider::register($dispatcher);

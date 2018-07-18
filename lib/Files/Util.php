@@ -44,7 +44,7 @@ class Util {
 		$this->shareManager = $shareManager;
 	}
 
-	public function getUsersWithAccessFile(string $fileId): array {
+	public function getAccessListToFile(string $fileId): array {
 		if (!isset($this->accessLists[$fileId])) {
 			$nodes = $this->rootFolder->getById($fileId);
 
@@ -55,14 +55,20 @@ class Util {
 			$node = array_shift($nodes);
 			$accessList = $this->shareManager->getAccessList($node);
 
-			$this->accessLists[$fileId] = $accessList['users'];
+			$this->accessLists[$fileId] = $accessList;
 		}
 
 		return $this->accessLists[$fileId];
 	}
 
 	public function canUserAccessFile(string $fileId, string $userId): bool {
-		return \in_array($userId, $this->getUsersWithAccessFile($fileId), true);
+		return \in_array($userId, $this->getAccessListToFile($fileId)['users'], true);
+	}
+
+	public function canGuestAccessFile(string $fileId): bool {
+		// TODO This does not work, probably because there is no root folder to
+		// get the node from if the current user is a guest.
+		return $this->getAccessListToFile($fileId)['public'];
 	}
 
 	/**
@@ -135,6 +141,11 @@ class Util {
 		}
 
 		$shares = $this->shareManager->getSharesBy($userId, \OCP\Share::SHARE_TYPE_ROOM, $node, $reshares, $limit);
+		if (\count($shares) > 0) {
+			return $shares[0];
+		}
+
+		$shares = $this->shareManager->getSharesBy($userId, \OCP\Share::SHARE_TYPE_LINK, $node, $reshares, $limit);
 		if (\count($shares) > 0) {
 			return $shares[0];
 		}

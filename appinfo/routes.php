@@ -342,6 +342,16 @@ return [
 		],
 
 		/**
+		 * PublicShare
+		 */
+		[
+			'name' => 'PublicShare#getRoom',
+			'url' => '/api/{apiVersion}/publicshare/{shareToken}',
+			'verb' => 'GET',
+			'requirements' => ['apiVersion' => 'v1'],
+		],
+
+		/**
 		 * Guest
 		 */
 		[

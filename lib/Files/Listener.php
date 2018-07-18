@@ -70,8 +70,11 @@ class Listener {
 		$listener = function(GenericEvent $event) {
 			/** @var Room $room */
 			$room = $event->getSubject();
+			/** @var self $listener */
+			$listener = \OC::$server->query(self::class);
+
 			try {
-				self::preventGuestsFromJoining($room);
+				$listener->preventGuestsFromJoining($room);
 			} catch (UnauthorizedException $e) {
 				$event->setArgument('cancel', true);
 			}
@@ -105,19 +108,26 @@ class Listener {
 	}
 
 	/**
-	 * Prevents guests from joining the room.
+	 * Prevents guests from joining the room if it is not publicly accessible.
 	 *
 	 * This method should be called before a guest joins a room.
 	 *
 	 * @param Room $room
 	 * @throws UnauthorizedException
 	 */
-	protected static function preventGuestsFromJoining(Room $room): void {
+	protected function preventGuestsFromJoining(Room $room): void {
 		if ($room->getObjectType() !== 'file') {
 			return;
 		}
 
-		throw new UnauthorizedException('Guests are not allowed in rooms for files');
+		// TODO What to do if the share is password protected?
+		// TODO Disabled by now for testing until "canGuestAccessFile" works as
+		// it should.
+// 		if ($this->util->canGuestAccessFile($room->getObjectId())) {
+// 			return;
+// 		}
+// 
+// 		throw new UnauthorizedException('Guests are not allowed in this room');
 	}
 
 }

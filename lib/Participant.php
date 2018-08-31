@@ -63,6 +63,8 @@ class Participant {
 	protected $notificationLevel;
 	/** @var bool */
 	private $isFavorite;
+	/** @var int */
+	private $lastReadMessage;
 	/** @var \DateTime|null */
 	private $lastMention;
 
@@ -75,6 +77,7 @@ class Participant {
 								int $inCall,
 								int $notificationLevel,
 								bool $isFavorite,
+								int $lastReadMessage,
 								\DateTime $lastMention = null) {
 		$this->db = $db;
 		$this->room = $room;
@@ -85,6 +88,7 @@ class Participant {
 		$this->inCall = $inCall;
 		$this->notificationLevel = $notificationLevel;
 		$this->isFavorite = $isFavorite;
+		$this->lastReadMessage = $lastReadMessage;
 		$this->lastMention = $lastMention;
 	}
 
@@ -172,6 +176,26 @@ class Participant {
 		$query->execute();
 
 		$this->notificationLevel = $notificationLevel;
+		return true;
+	}
+
+	public function getLastReadMessage(): int {
+		return $this->lastReadMessage;
+	}
+
+	public function setLastReadMessage(int $messageId): bool {
+		if (!$this->user) {
+			return false;
+		}
+
+		$query = $this->db->getQueryBuilder();
+		$query->update('talk_participants')
+			->set('last_read_message', $query->createNamedParameter($messageId, IQueryBuilder::PARAM_INT))
+			->where($query->expr()->eq('user_id', $query->createNamedParameter($this->user)))
+			->andWhere($query->expr()->eq('room_id', $query->createNamedParameter($this->room->getId())));
+		$query->execute();
+
+		$this->lastReadMessage = $messageId;
 		return true;
 	}
 }

@@ -140,7 +140,7 @@ class Manager {
 			$lastMention = $this->timeFactory->getDateTime($row['last_mention']);
 		}
 
-		return new Participant($this->db, $room, (string) $row['user_id'], (int) $row['participant_type'], (int) $row['last_ping'], (string) $row['session_id'], (int) $row['in_call'], (int) $row['notification_level'], (bool) $row['favorite'], $lastMention);
+		return new Participant($this->db, $room, (string) $row['user_id'], (int) $row['participant_type'], (int) $row['last_ping'], (string) $row['session_id'], (int) $row['in_call'], (int) $row['notification_level'], (bool) $row['favorite'], (int) $row['last_read_message'], $lastMention);
 	}
 
 	/**

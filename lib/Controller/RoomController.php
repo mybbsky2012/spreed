@@ -227,12 +227,13 @@ class RoomController extends AEnvironmentAwareController {
 
 		$currentUser = $this->userManager->get($currentParticipant->getUser());
 		if ($currentUser instanceof IUser) {
-			$unreadSince = $this->chatManager->getUnreadMarker($room, $currentUser);
+			$lastReadMessage = $currentParticipant->getLastReadMessage();
+			$roomData['unreadMessages'] = $this->chatManager->getUnreadCount($room, $lastReadMessage);
+
 			if ($currentParticipant instanceof Participant) {
-				$lastMention = $currentParticipant->getLastMention();
-				$roomData['unreadMention'] = $lastMention !== null && $unreadSince < $lastMention;
+				$lastMention = $currentParticipant->getLastMentionMessage();
+				$roomData['unreadMention'] = $lastMention !== 0 && $lastReadMessage < $lastMention;
 			}
-			$roomData['unreadMessages'] = $this->chatManager->getUnreadCount($room, $unreadSince);
 		}
 
 		$numActiveGuests = 0;

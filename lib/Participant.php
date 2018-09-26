@@ -65,8 +65,8 @@ class Participant {
 	private $isFavorite;
 	/** @var int */
 	private $lastReadMessage;
-	/** @var \DateTime|null */
-	private $lastMention;
+	/** @var int */
+	private $lastMentionMessage;
 
 	public function __construct(IDBConnection $db,
 								Room $room,
@@ -78,7 +78,7 @@ class Participant {
 								int $notificationLevel,
 								bool $isFavorite,
 								int $lastReadMessage,
-								\DateTime $lastMention = null) {
+								int $lastMentionMessage) {
 		$this->db = $db;
 		$this->room = $room;
 		$this->user = $user;
@@ -89,7 +89,7 @@ class Participant {
 		$this->notificationLevel = $notificationLevel;
 		$this->isFavorite = $isFavorite;
 		$this->lastReadMessage = $lastReadMessage;
-		$this->lastMention = $lastMention;
+		$this->lastMentionMessage = $lastMentionMessage;
 	}
 
 	public function getUser(): string {
@@ -122,13 +122,6 @@ class Participant {
 
 	public function getInCallFlags(): int {
 		return $this->inCall;
-	}
-
-	/**
-	 * @return \DateTime|null
-	 */
-	public function getLastMention(): ?\DateTime {
-		return $this->lastMention;
 	}
 
 	public function isFavorite(): bool {
@@ -196,6 +189,26 @@ class Participant {
 		$query->execute();
 
 		$this->lastReadMessage = $messageId;
+		return true;
+	}
+
+	public function getLastMentionMessage(): int {
+		return $this->lastMentionMessage;
+	}
+
+	public function setLastMentionMessage(int $messageId): bool {
+		if (!$this->user) {
+			return false;
+		}
+
+		$query = $this->db->getQueryBuilder();
+		$query->update('talk_participants')
+			->set('last_mention_message', $query->createNamedParameter($messageId, IQueryBuilder::PARAM_INT))
+			->where($query->expr()->eq('user_id', $query->createNamedParameter($this->user)))
+			->andWhere($query->expr()->eq('room_id', $query->createNamedParameter($this->room->getId())));
+		$query->execute();
+
+		$this->lastMentionMessage = $messageId;
 		return true;
 	}
 }

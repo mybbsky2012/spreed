@@ -228,6 +228,15 @@ class RoomController extends AEnvironmentAwareController {
 		$currentUser = $this->userManager->get($currentParticipant->getUser());
 		if ($currentUser instanceof IUser) {
 			$lastReadMessage = $currentParticipant->getLastReadMessage();
+			if ($lastReadMessage === -1) {
+				/*
+				 * Because the migration from the old comment_read_markers was
+				 * not possible in a programmatic way with a reasonable O(1) or O(n)
+				 * but only with O(user×chat), we do the conversion here.
+				 */
+				$lastReadMessage = $this->chatManager->getLastReadMessageFromLegacy($room, $currentUser);
+				$currentParticipant->setLastReadMessage($lastReadMessage);
+			}
 			$roomData['unreadMessages'] = $this->chatManager->getUnreadCount($room, $lastReadMessage);
 
 			if ($currentParticipant instanceof Participant) {

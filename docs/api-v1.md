@@ -35,6 +35,7 @@
   * [Sending a new chat message](#sending-a-new-chat-message)
   * [Get mention autocomplete suggestions](#get-mention-autocomplete-suggestions)
   * [System messages](#system-messages)
+  * [Mark chat as read](#mark-chat-as-read)
 - [Guests](#guests)
   * [Set display name](#set-display-name)
 - [Signaling](#signaling)
@@ -100,6 +101,9 @@ Base endpoint is: `/ocs/v2.php/apps/spreed/api/v1`
 ### 6.0
 * `locked-one-to-one-rooms` - One-to-one conversations are now locked to the users. Neither guests nor other participants can be added, so the options to do that should be hidden as well. Also a user can only leave a one-to-one conversation (not delete). It will be deleted when the other participant left too. If the other participant posts a new chat message or starts a call, the left-participant will be re-added.
 * `read-only-rooms` - Conversations can be in `read-only` mode which means people can not do calls or write chat messages.
+
+### 7.0
+* `new-chat-flow` - The read marker for the chat needs to be set manually, see [Better chat flow experience](https://github.com/nextcloud/spreed/issues/1164)
 
 ## Conversation management
 
@@ -587,6 +591,22 @@ Base endpoint is: `/ocs/v2.php/apps/spreed/api/v1`
 
     - Data:
         The full message array of the new message, as defined in [Receive chat messages of a conversation](#receive-chat-messages-of-a-conversation)
+
+### Mark chat as read
+
+* Method: `POST`
+* Endpoint: `/chat/{token}/read`
+* Data:
+
+    field | type | Description
+    ------|------|------------
+    `lastReadMessage` | int | The last read message ID
+
+* Response:
+    - Header:
+        + `200 OK`
+        + `404 Not Found` When the room could not be found for the participant,
+        or the participant is a guest.
 
 ### Get mention autocomplete suggestions
 

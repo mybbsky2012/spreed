@@ -273,6 +273,18 @@ class ChatController extends AEnvironmentAwareController {
 	}
 
 	/**
+	 * @NoAdminRequired
+	 * @RequireParticipant
+	 *
+	 * @param int $lastReadMessage
+	 * @return DataResponse
+	 */
+	public function setReadMarker(int $lastReadMessage): DataResponse {
+		$this->participant->setLastReadMessage($lastReadMessage);
+		return new DataResponse();
+	}
+
+	/**
 	 * @PublicPage
 	 * @RequireParticipant
 	 * @RequireReadWriteConversation

@@ -79,6 +79,7 @@ class CapabilitiesTest extends TestCase {
 					'invite-groups-and-mails',
 					'locked-one-to-one-rooms',
 					'read-only-rooms',
+					'new-chat-flow',
 				],
 			],
 		], $capabilities->getCapabilities());
@@ -121,6 +122,7 @@ class CapabilitiesTest extends TestCase {
 					'invite-groups-and-mails',
 					'locked-one-to-one-rooms',
 					'read-only-rooms',
+					'new-chat-flow',
 				],
 			],
 		], $capabilities->getCapabilities());

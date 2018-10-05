@@ -177,6 +177,7 @@ class RoomController extends AEnvironmentAwareController {
 			'hasPassword' => $room->hasPassword(),
 			'hasCall' => false,
 			'lastActivity' => 0,
+			'lastReadMessage' => 0,
 			'unreadMessages' => 0,
 			'unreadMention' => false,
 			'isFavorite' => false,
@@ -239,10 +240,9 @@ class RoomController extends AEnvironmentAwareController {
 			}
 			$roomData['unreadMessages'] = $this->chatManager->getUnreadCount($room, $lastReadMessage);
 
-			if ($currentParticipant instanceof Participant) {
-				$lastMention = $currentParticipant->getLastMentionMessage();
-				$roomData['unreadMention'] = $lastMention !== 0 && $lastReadMessage < $lastMention;
-			}
+			$lastMention = $currentParticipant->getLastMentionMessage();
+			$roomData['unreadMention'] = $lastMention !== 0 && $lastReadMessage < $lastMention;
+			$roomData['lastReadMessage'] = $lastReadMessage;
 		}
 
 		$numActiveGuests = 0;

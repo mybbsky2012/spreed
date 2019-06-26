@@ -29,6 +29,7 @@ use OCA\Spreed\Exceptions\ParticipantNotFoundException;
 use OCA\Spreed\Exceptions\RoomNotFoundException;
 use OCA\Spreed\Manager;
 use OCA\Spreed\Participant;
+use OCA\Spreed\TalkSession;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSNotFoundException;
@@ -37,6 +38,7 @@ use OCP\Files\FileInfo;
 use OCP\Files\NotFoundException;
 use OCP\IL10N;
 use OCP\IRequest;
+use OCP\ISession;
 use OCP\IUser;
 use OCP\IUserManager;
 use OCP\Notification\IManager as NotificationManager;
@@ -46,45 +48,33 @@ use OCP\Share\IShare;
 
 class PublicShareController extends OCSController {
 
-	/** @var IUserManager */
-	private $userManager;
-	/** @var NotificationManager */
-	private $notificationManager;
 	/** @var ShareManager */
 	private $shareManager;
+	/** @var ISession */
+	private $session;
+	/** @var TalkSession */
+	private $talkSession;
 	/** @var Manager */
 	private $manager;
-	/** @var IL10N */
-	private $l10n;
 
-	/**
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param IUserManager $userManager
-	 * @param NotificationManager $notificationManager
-	 * @param ShareManager $shareManager
-	 * @param Manager $manager
-	 * @param IL10N $l10n
-	 */
 	public function __construct(
 			$appName,
 			IRequest $request,
-			IUserManager $userManager,
-			NotificationManager $notificationManager,
 			ShareManager $shareManager,
-			Manager $manager,
-			IL10N $l10n
+			ISession $session,
+			TalkSession $talkSession,
+			Manager $manager
 	) {
 		parent::__construct($appName, $request);
-		$this->userManager = $userManager;
-		$this->notificationManager = $notificationManager;
 		$this->shareManager = $shareManager;
+		$this->session = $session;
+		$this->talkSession = $talkSession;
 		$this->manager = $manager;
-		$this->l10n = $l10n;
 	}
 
 	/**
 	 * @PublicPage
+	 * @UseSession
 	 *
 	 * TODO
 	 * Creates a new room for requesting the password of a share.
@@ -107,14 +97,17 @@ class PublicShareController extends OCSController {
 	 *         found" if the given share was invalid.
 	 */
 	public function getRoom(string $shareToken) {
-	error_log("Get room for $shareToken");
-		// TODO remove?
 		try {
 			$share = $this->shareManager->getShareByToken($shareToken);
+			if ($share->getPassword() !== null) {
+				$shareId = $this->session->get('public_link_authenticated');
+				if ($share->getId() !== $shareId) {
+					throw new ShareNotFound();
+				}
+			}
 		} catch (ShareNotFound $e) {
 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 		}
-	error_log("Share found");
 
 		$fileId = (string)$share->getNodeId();
 
@@ -128,6 +121,8 @@ class PublicShareController extends OCSController {
 			}
 			$room = $this->manager->createPublicRoom($name, 'file', $fileId);
 		}
+
+		$this->talkSession->setFileShareTokenForRoom($room->getToken(), $shareToken);
 
 // 		try {
 // 			$room->getParticipant($this->currentUser);
@@ -145,7 +140,7 @@ class PublicShareController extends OCSController {
 // 			return new DataResponse([], Http::STATUS_NOT_FOUND);
 // 		}
 // 	error_log("Room found");
-// 
+//
 // 		return new DataResponse([
 // 			'token' => $room->getToken(),
 // 			'name' => $room->getName(),

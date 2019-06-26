@@ -25,6 +25,7 @@ namespace OCA\Spreed\Files;
 
 use OCA\Spreed\Exceptions\UnauthorizedException;
 use OCA\Spreed\Room;
+use OCA\Spreed\TalkSession;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 
@@ -47,9 +48,13 @@ class Listener {
 
 	/** @var Util */
 	protected $util;
+	/** @var TalkSession */
+	protected $talkSession;
 
-	public function __construct(Util $util) {
+	public function __construct(Util $util,
+								TalkSession $talkSession) {
 		$this->util = $util;
+		$this->talkSession = $talkSession;
 	}
 
 	public static function register(EventDispatcherInterface $dispatcher): void {
@@ -120,14 +125,12 @@ class Listener {
 			return;
 		}
 
-		// TODO What to do if the share is password protected?
-		// TODO Disabled by now for testing until "canGuestAccessFile" works as
-		// it should.
-// 		if ($this->util->canGuestAccessFile($room->getObjectId())) {
-// 			return;
-// 		}
-// 
-// 		throw new UnauthorizedException('Guests are not allowed in this room');
+		$shareToken = $this->talkSession->getFileShareTokenForRoom($room->getToken());
+		if ($shareToken && $this->util->canGuestAccessFile($shareToken)) {
+			return;
+		}
+
+		throw new UnauthorizedException('Guests are not allowed in this room');
 	}
 
 }

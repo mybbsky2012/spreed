@@ -23,9 +23,13 @@ declare(strict_types=1);
 
 namespace OCA\Spreed\Files;
 
+use OC\Share\Constants;
 use OCP\Files\IRootFolder;
 use OCP\Files\Node;
 use OCP\Files\NotFoundException;
+use OCP\ISession;
+use OCP\Share;
+use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager as IShareManager;
 use OCP\Share\IShare;
 
@@ -33,14 +37,18 @@ class Util {
 
 	/** @var IRootFolder */
 	private $rootFolder;
+	/** @var ISession */
+	private $session;
 	/** @var IShareManager */
 	private $shareManager;
 	/** @var array[] */
 	private $accessLists = [];
 
 	public function __construct(IRootFolder $rootFolder,
+			ISession $session,
 			IShareManager $shareManager) {
 		$this->rootFolder = $rootFolder;
+		$this->session = $session;
 		$this->shareManager = $shareManager;
 	}
 
@@ -65,10 +73,19 @@ class Util {
 		return \in_array($userId, $this->getAccessListToFile($fileId)['users'], true);
 	}
 
-	public function canGuestAccessFile(string $fileId): bool {
-		// TODO This does not work, probably because there is no root folder to
-		// get the node from if the current user is a guest.
-		return $this->getAccessListToFile($fileId)['public'];
+	public function canGuestAccessFile(string $shareToken): bool {
+		try {
+			$share = $this->shareManager->getShareByToken($shareToken);
+			if ($share->getPassword() !== null) {
+				$shareId = $this->session->get('public_link_authenticated');
+				if ($share->getId() !== $shareId) {
+					throw new ShareNotFound();
+				}
+			}
+			return true;
+		} catch (ShareNotFound $e) {
+			return false;
+		}
 	}
 
 	/**

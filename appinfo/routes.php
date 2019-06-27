@@ -383,6 +383,19 @@ return [
 				'id' => '^\d+$',
 			],
 		],
+
+		/**
+		 * Webinary
+		 */
+		[
+			'name' => 'Webinary#setLobbyState',
+			'url' => '/api/{apiVersion}/room/{token}/webinary/lobby',
+			'verb' => 'PUT',
+			'requirements' => [
+				'apiVersion' => 'v1',
+				'token' => '^[a-z0-9]{4,30}$',
+			],
+		],
 	],
 ];
 

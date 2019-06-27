@@ -558,6 +558,7 @@ class RoomController extends AEnvironmentAwareController {
 	/**
 	 * @PublicPage
 	 * @RequireParticipant
+	 * @RequireModeratorOrNoLobby
 	 *
 	 * @return DataResponse
 	 */
@@ -854,6 +855,7 @@ class RoomController extends AEnvironmentAwareController {
 	/**
 	 * @PublicPage
 	 * @UseSession
+	 * @RequireModeratorOrNoLobby
 	 *
 	 * @param string $token
 	 * @param string $password

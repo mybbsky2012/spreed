@@ -126,7 +126,12 @@ class Manager {
 			]));
 		}
 
-		return new Room($this, $this->db, $this->secureRandom, $this->dispatcher, $this->timeFactory, $this->hasher, (int) $row['id'], (int) $row['type'], (int) $row['read_only'], (int) $row['lobby_state'], $row['token'], $row['name'], $row['password'], (int) $row['active_guests'], $activeSince, $lastActivity, $lastMessage, (string) $row['object_type'], (string) $row['object_id']);
+		$lobbyTimer = null;
+		if (!empty($row['lobby_timer'])) {
+			$lobbyTimer = $this->timeFactory->getDateTime($row['lobby_timer']);
+		}
+
+		return new Room($this, $this->db, $this->secureRandom, $this->dispatcher, $this->timeFactory, $this->hasher, (int) $row['id'], (int) $row['type'], (int) $row['read_only'], (int) $row['lobby_state'], $row['token'], $row['name'], $row['password'], (int) $row['active_guests'], $activeSince, $lastActivity, $lastMessage, $lobbyTimer, (string) $row['object_type'], (string) $row['object_id']);
 	}
 
 	/**

@@ -37,6 +37,7 @@ use OCA\Spreed\Manager;
 use OCA\Spreed\Participant;
 use OCA\Spreed\Room;
 use OCA\Spreed\TalkSession;
+use OCA\Spreed\Webinary;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Utility\ITimeFactory;
@@ -215,6 +216,10 @@ class RoomController extends AEnvironmentAwareController {
 			'lastActivity' => $lastActivity,
 			'isFavorite' => $currentParticipant->isFavorite(),
 			'notificationLevel' => $currentParticipant->getNotificationLevel(),
+			'lobbyState' => $room->getLobbyState(),
+			'lobbyTimer' => $room->getLobbyTimer(),
+			'lastPing' => $currentParticipant->getLastPing(),
+			'sessionId' => $currentParticipant->getSessionId(),
 		]);
 
 		if ($roomData['notificationLevel'] === Participant::NOTIFY_DEFAULT) {
@@ -223,6 +228,12 @@ class RoomController extends AEnvironmentAwareController {
 			} else {
 				$roomData['notificationLevel'] = $room->getType() === Room::ONE_TO_ONE_CALL ? Participant::NOTIFY_ALWAYS : Participant::NOTIFY_MENTION;
 			}
+		}
+
+		if ($room->getLobbyState() === Webinary::MODERATORS_ONLY &&
+			!$currentParticipant->hasModeratorPermissions()) {
+			// No participants and chat messages for users in the lobby.
+			return $roomData;
 		}
 
 		$currentUser = $this->userManager->get($currentParticipant->getUser());
@@ -285,8 +296,6 @@ class RoomController extends AEnvironmentAwareController {
 		}
 
 		$roomData = array_merge($roomData, [
-			'lastPing' => $currentParticipant->getLastPing(),
-			'sessionId' => $currentParticipant->getSessionId(),
 			'participants' => $participantList,
 			'numGuests' => $numActiveGuests,
 			'lastMessage' => $lastMessage,

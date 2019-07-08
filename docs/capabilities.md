@@ -34,4 +34,4 @@ title: Capabilities
 * `read-only-rooms` - Conversations can be in `read-only` mode which means people can not do calls or write chat messages.
 
 ## 7.0
-* `webinary-lobby` - Group and public conversations can have a lobby. This means only moderators can join the conversation, chat and call. Others can only pull the room endpoint for an update and should join the room as soon as the lobby got disabled.
+* `webinary-lobby` - See [Webinary management](webinary.md) for technical details.

@@ -772,7 +772,6 @@
 		this.id = 1;
 		this.pendingMessages = [];
 		this.connected = false;
-		this._forceReconnect = false;
 		this.socket = new WebSocket(this.url);
 		window.signalingSocket = this.socket;
 		this.socket.onopen = function(event) {

@@ -320,7 +320,7 @@
 
 						if (extensionURL) {
 							var text = t('spreed', 'Screensharing extension is required to share your screen.');
-							var element = '<a href="' + extensionURL + '" target="_blank">' + text + '</a>';
+							var element = '<a href="' + extensionURL + '" target="_blank">' + escapeHTML(text) + '</a>';
 
 							OC.Notification.showTemporary(element, {isHTML: true});
 						} else {
